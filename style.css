@@ -1,0 +1,360 @@
+/* ==========================================================================
+   gioco-test — foglio di stile principale
+   Collegarlo nell'<head> di index.html:
+     <link rel="stylesheet" href="style.css">
+
+   Classi disponibili (tutte opzionali):
+     .app            contenitore principale della pagina
+     .header         barra in alto con .title
+     .hud            riga con punteggio, vite, livello (.hud-item)
+     .board          area di gioco (va bene anche per un <canvas>)
+     .controls       gruppo di pulsanti
+     .btn            pulsante (varianti: .btn-primary, .btn-danger)
+     .overlay        schermata sopra il gioco (pausa, game over)
+     .panel          riquadro dentro l'overlay
+     .hidden         nasconde un elemento
+   ========================================================================== */
+
+/* ---------- Token ---------- */
+:root {
+  --bg: #f4f1ea;
+  --surface: #ffffff;
+  --surface-2: #ebe6db;
+  --text: #1d1b18;
+  --text-muted: #6b665d;
+  --border: #d6cfc1;
+
+  --primary: #2f6fd6;
+  --primary-hover: #2459ad;
+  --accent: #e8a33d;
+  --danger: #c8443a;
+  --success: #3a9a5b;
+
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.06), 0 8px 24px rgb(0 0 0 / 0.08);
+
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  --transition: 150ms ease;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #131417;
+    --surface: #1c1e22;
+    --surface-2: #26292f;
+    --text: #ecebe8;
+    --text-muted: #9a978f;
+    --border: #33363d;
+    --primary: #5b93ee;
+    --primary-hover: #7aa8f2;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.35);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #131417;
+  --surface: #1c1e22;
+  --surface-2: #26292f;
+  --text: #ecebe8;
+  --text-muted: #9a978f;
+  --border: #33363d;
+  --primary: #5b93ee;
+  --primary-hover: #7aa8f2;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.35);
+  color-scheme: dark;
+}
+
+/* ---------- Reset ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+button {
+  font: inherit;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  line-height: 1.2;
+}
+
+p {
+  margin: 0 0 var(--space-3);
+}
+
+/* ---------- Layout ---------- */
+.app {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* ---------- HUD ---------- */
+.hud {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.hud-item {
+  display: flex;
+  flex-direction: column;
+  min-width: 88px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.hud-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.hud-value {
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Area di gioco ---------- */
+.board {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  touch-action: none; /* evita scroll/zoom mentre si gioca su mobile */
+  user-select: none;
+}
+
+.board canvas {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+/* ---------- Pulsanti ---------- */
+.controls {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition), transform var(--transition),
+    border-color var(--transition);
+}
+
+.btn:hover {
+  border-color: var(--text-muted);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+.btn-danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+
+/* ---------- Overlay (pausa / game over) ---------- */
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  background: rgb(0 0 0 / 0.55);
+  backdrop-filter: blur(3px);
+  animation: fade-in 200ms ease;
+}
+
+.panel {
+  width: min(360px, 100%);
+  padding: var(--space-5);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.panel h2 {
+  font-size: 1.75rem;
+  margin-bottom: var(--space-3);
+}
+
+.panel .controls {
+  margin-top: var(--space-4);
+}
+
+/* ---------- Stati e utilità ---------- */
+.is-win {
+  color: var(--success);
+}
+
+.is-lose {
+  color: var(--danger);
+}
+
+.flash {
+  animation: flash 300ms ease;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+/* ---------- Animazioni ---------- */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes flash {
+  0%,
+  100% {
+    background: var(--surface);
+  }
+  50% {
+    background: var(--accent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 560px) {
+  .app {
+    padding: var(--space-4);
+  }
+
+  .hud-item {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .board {
+    aspect-ratio: 3 / 4;
+  }
+
+  .controls .btn {
+    flex: 1 1 auto;
+  }
+}
